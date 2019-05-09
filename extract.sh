@@ -25,19 +25,13 @@ for project in sources/*/*; do
     echo $project
     cd $project
     composer install
-    if [ -d "src" ]; then
-        $WORKING_DIR/../psalm/psalm --init
-    elif [ -d "lib" ]; then
-        $WORKING_DIR/../psalm/psalm --init lib
-    fi
+    $WORKING_DIR/../psalm/psalm --init
     cd $WORKING_DIR
 done
 
 for project in sources/*/*; do
     echo $project
     cd $project
-    set +e
     $WORKING_DIR/../psalm/psalm --show-info=false
-    set -e
     cd $WORKING_DIR
 done
