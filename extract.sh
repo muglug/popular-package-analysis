@@ -36,6 +36,11 @@ for project in sources/*/*; do
         continue 
     fi
 
+    if [[ $project == *"mpdf"* ]]
+    then
+        continue 
+    fi
+
     echo $project
     cd $project
     composer install --no-dev
