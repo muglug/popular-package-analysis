@@ -4,6 +4,8 @@ WORKING_DIR=$(pwd)
 
 cd $WORKING_DIR
 
+PSALM_BIN=$WORKING_DIR/../psalm/psalm
+
 for zip in zipballs/*/*.zip; do
     target=${zip/zipballs/sources}
     target=${target/.zip/}
@@ -41,10 +43,21 @@ for project in sources/*/*; do
         continue 
     fi
 
+    if [[ $project == *"zendframework1"* ]]
+    then
+        continue 
+    fi
+
+    summary_path=$project/psalm-summary.json
+
+    if [ -f $summary_path ]; then
+        continue
+    fi
+
     echo $project
     cd $project
-    composer install --no-dev
-    $WORKING_DIR/../psalm/psalm --init
-    $WORKING_DIR/../psalm/psalm --no-cache --show-info=false
+    composer install --no-dev --ignore-platform-reqs
+    $PSALM_BIN --init
+    $PSALM_BIN --no-cache --find-dead-code --show-info=false --threads=6 --report=psalm-summary.json
     cd $WORKING_DIR
 done
