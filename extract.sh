@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 GLOBIGNORE=".:.."
 WORKING_DIR=$(pwd)
 
@@ -15,23 +14,32 @@ for zip in zipballs/*/*.zip; do
 
     echo "Extracting..."
     mkdir -p $target
-    unzip $zip -d $target
+    unzip -qq $zip -d $target
     subdir=($target/*)
     mv $subdir/* $target
     rmdir $subdir
 done
 
 for project in sources/*/*; do
-    echo $project
-    cd $project
-    composer install
-    $WORKING_DIR/../psalm/psalm --init
-    cd $WORKING_DIR
-done
+    if [[ $project == *"polyfill"* ]]
+    then
+        continue 
+    fi
 
-for project in sources/*/*; do
+    if [[ $project == *"laravel-aws-worker"* ]]
+    then
+        continue 
+    fi
+
+    if [[ $project == *"phpmailer"* ]]
+    then
+        continue 
+    fi
+
     echo $project
     cd $project
-    $WORKING_DIR/../psalm/psalm --show-info=false
+    composer install --no-dev
+    $WORKING_DIR/../psalm/psalm --init
+    $WORKING_DIR/../psalm/psalm --no-cache --show-info=false
     cd $WORKING_DIR
 done
